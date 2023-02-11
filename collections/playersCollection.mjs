@@ -184,6 +184,7 @@ class PlayersCollection {
 
     url += "/stats";
 
+    let dateType;
     if (date) {
       if (date === "lastweek" || date === "lastmonth") {
         dateType = date;

@@ -167,6 +167,53 @@ class PlayersCollection {
         throw e;
       });
   }
+
+  stats(...args) {
+    const cb = extractCallback(args);
+    let playerKeys = args.shift(),
+      date = args.length ? args.shift() : [];
+
+    if (!Array.isArray(playerKeys)) {
+      playerKeys = [playerKeys];
+    }
+
+    let url =
+      "https://fantasysports.yahooapis.com/fantasy/v2/players;player_keys=";
+
+    url += playerKeys.join(",");
+
+    url += "/stats";
+
+    if (date) {
+      if (date === "lastweek" || date === "lastmonth") {
+        dateType = date;
+        url += `;type=${date}`;
+      } else if (date.indexOf("-") > 0) {
+        dateType = "date";
+        // string is date, of format y-m-d
+        url += `;type=date;date=${date}`;
+      } else {
+        dateType = "week";
+        // number is week...
+        url += `;type=week;week=${date}`;
+      }
+    }
+
+    return this.yf
+      .api(this.yf.GET, url)
+      .then((data) => {
+        const players = parseCollection(data.fantasy_content.players, [
+          "stats",
+        ]);
+
+        cb(null, players);
+        return players;
+      })
+      .catch((e) => {
+        cb(e);
+        throw e;
+      });
+  }
 }
 
 export default PlayersCollection;
